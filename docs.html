@@ -1,0 +1,219 @@
+<!doctype html>
+<head>
+  <title>Question Builder Documentation</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/contrib/auto-render.min.js"></script>
+
+<link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+<style>
+p{
+
+margin:10px;
+
+}
+</style>
+</head>
+
+<body>
+  <div class = "container">
+<div class = "row">
+<div class = "col-md-8 col-md-offset-2 text-center">
+
+<h1>Question-Builder Editor Documentation</h1>
+These are some notes for using the question editor feature in <a href = "http://meteor1.evanweinberg.org">QuestionBuilder</a>. 
+<hr>
+</div>
+</div>
+<div class = "row">
+<div class = "col-md-12">
+<h3>The Editor</h3>
+
+The editor is a set of HTML form elements, so all of the limitations of these elements apply. Here's the layout:
+<div class = "row">
+  <div class = "col-md-12">
+<img src = "img/editor.png" class="img-thumbnail" width = "90%">
+</div>
+</div>
+
+<h4>Formatting text</h4>
+
+<p>Added text to either the question or the answer text areas will be previewed in the corresponding areas above. All HTML elements can be used, including lists, formatting tags such as <code> bold </code> and <code> <strike>strikethrough</strike> </code>, and images. If you leave tags unclosed (like the <code>&lt p &gt</code> tag below), it won't break anything, but it's still a good idea to try.
+</p>
+
+<p>
+If you want to use LaTEX formatting to specific text in your question, you can enclose this text in <code> &lt eq &gt &lt /eq &gt </code> tags. This formatting is done in realtime using the <a href = "http://https://github.com/khan/katex/">KaTEX library</a>.
+</p>
+
+<div class = "row">
+  <div class = "col-md-6 col-md-offset-3">
+<img src = "img/eqn-example.png" class="img-thumbnail" >
+</div>
+</div>
+
+
+
+<h4>Adding Variables</h4>
+
+
+<p>
+One unique feature of Question-Builder is the ability to write questions with computable elements. This is driven by <code>variables</code> that you introduce through the editor. You can add a variable by clicking on the <strong>Add Variable</strong> button. The leftmost form field contains the <i>name</i> of the variable, and you can change this to be any valid Javascript variable name. You can delete a variable by clicking on the trash can symbol on the right side of the variable element.
+</p>
+
+<div class = "row">
+  <div class = "col-md-8 col-md-offset-2">
+<img src = "img/variables.png" class="img-thumbnail" >
+</div>
+</div>
+
+<p>
+You can include the value of a variable in the text of a question or answer using the <code>@</code> symbol.
+
+</p>
+
+<p>There are four types of variables in Question-Builder at the moment.
+  <ul>
+    <li><strong>Random Integer</strong> generate a number between the minimum and maximum values entered into the two fields to the right of the variable type selector. You can exclude specific values in the range by separating these values with commas in the leftmost text field.</li>
+    <li><strong>Random Decimal</strong> generates a decimal number between the maximum and minimum values. You can specify the number of decimal places you want the variable value to have.</li>
+    <li>The <strong>Calculated Value</strong> type allows you to use a Javascript expression to generate a value that is then stored in the variable with the associated name. These calculations can include the values of other variables, again using the <code>@</code> symbol.</li>
+    <li>The <strong>Custom JS</strong> type is similar in its use of Javascript. The Javascript code you enter into the form field is put into a function that is then called to determine the value of the variable. The value of the variable will be set to the returned value of this function. If no value is returned, this variable will have no value.</li>
+  </ul>
+   </p>
+
+<p>
+In the example variables above, the following variables are set:
+<ol>
+<li>A variable called <b>number1</b> is set to a random integer between 1 and 10 that is not 6.</li>
+<li>A variable called <b>number2</b> is set to a random decimal between 2 and 5 rounded to one decimal place.</li>
+<li>The variable <b>sum</b> is calculated as the sum of the <b>number1</b> and <b>number2</b> variables.</li>
+</ol>
+</p>
+
+<p>
+  Clicking the 'Insert Variables' button generates values for each variable.  These values are shown at the right side of each variable element. If any of the variable expressions generate an error, an alert message will appear. These variable values will also be inserted into the question and answer preview areas. The values will be recalculated with each click of the button.
+</p>
+<p class="bg-info">
+<b>Note:</b> Variables are calculated in order from top to bottom. If one variable's value refers to another variable that appears below it in the list, inserting variables will cause an error. You can click and drag the variable elements to change the order if needed.
+
+</p>
+
+
+<h4>Javascript Options</h4>
+
+<p>A number of utility functions from the Khan Academy exercise library have been added to Question Builder. You can access their documentation for these functions at <a href = "https://github.com/Khan/khan-exercises/wiki/Utility-Module-Reference">https://github.com/Khan/khan-exercises/wiki/Utility-Module-Reference</a>. These Khan Academy created functions can be accessed by preceding the function name with <code>Kh.functionName(attributes)</code> where functionName is the function you want to use. Here are some of the more useful functions that have turned out to be useful in the development of questions thus far:</p>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h5><code>Kh.cleanMath(mathString)</code></h5>
+    <p>One of the issues with dynamically generated values that can be negative and positive is the issue of signs. This function turns
+    \( x^2 + -3 x - -5 \)
+    into
+    \( x^2 -3 x + 5 \).
+  </p>
+
+  <p>Here is an example of how this might be used:</p>
+  <div class = "row">
+    <div class = "col-md-12 ">
+  <img src = "img/cleanMath.png" class="img-thumbnail" >
+  </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h5><code>Kh.randRange(min,max) and Kh.randRangeExclude(min,max,[excludedValues])</code></h5>
+    <p> These functions are what is used in the <b>Random Integer</b> and <b>Random Decimal</b> variable types. It is often useful to use these in custom JS or calculated value variables directly when you want the range to be a variable.
+  </p>
+ <p>In this example, a random integer between 1 and 5 is stored in the variable <code>a</code>, and then a second integer is selected between <code>a</code> and <code>10</code>.  This is a way to ensure that one variable value is less than another. </p>
+  <div class = "row">
+    <div class = "col-md-12 ">
+  <img src = "img/randRangeExample.png" class="img-thumbnail" >
+  </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h5><code>Kh.randFromArray(array)</code></h5>
+    Returns a random element from an array of values. This array can contain strings, numbers, or any JS variable type.
+    <p>For example, <code>Kh.randFromArray(['x','y','w','n'])</code> will return either 'x','y','w', or 'n'. This is useful when you want to use different variables for each new generated question.</p>
+    <p>It also allows for the <u>content</u> of a question to be changed dynamically. Using a variable that has a value generated from  <code>Kh.randFromArray(['x-intercept','y-intercept'])</code> in the text of the question will ask for either the x-intercept or y-intercept. The answer text can be determined using custom Javascript to match what is being asked.</p>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h5><code>Kh.fractionSimplification(numerator,denominator)</code></h5>
+    Returns LaTEX text of the fraction as given, and then in simplified form.
+<p>For example, <code>Kh.fractionSimplification(2,4)</code> will return \[ \frac{2}{4}  =  \dfrac{1}{2} \].</p>
+
+     Here's an example of this function in action:
+    <div class = "row">
+      <div class = "col-md-12 ">
+    <img src = "img/fraction-simplification.png" class="img-thumbnail" >
+    </div>
+    </div>
+  </div>
+</div>
+
+
+
+<h4>Tricks</h4>
+<p>There a number of quirks in how this works, but these tend to only occur when trying to do intermediate things with custom JS or calculated values. Here are some hints:</p>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+<p> Whenever errors in variable values result, clicking on 'Insert Values' might result in the application being unresponsive. One trick to fix this is to click and drag a variable to a different location, and then bring it back. This reads in the variable values again and should restore normal functionality if the code itself is error free.</p>
+</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+  <p>It is possible to use arrays in questions, but due to the way the values are being placed into the HTML, you need to explicitly state that these variables are arrays. For example, this is how you would access the first element of an array:</p>
+    <div class = "row">
+      <div class = "col-md-12 ">
+    <img src = "img/array.png" class="img-thumbnail" >
+    </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+
+  <p>
+    It is possible to use variable values within functions like <code>Kh.randRangeExclude()</code> but these functions require that the minimum and maximum values of the range are in increasing order. If a value of a variable results in the call to this function where the minimum is 10, and the maximum is 3, for example, this will result in an error.
+  </p>
+
+</div>
+</div>
+
+<h3>Questions?</h3>
+<p>Obviously this is a work in progress. Please contact @emwdx with suggestions or errors that you see happening, and he'll work on it when he can.</p>
+<hr>
+<p>Created by <a href = "http://www.evanweinberg.com">Evan Weinberg</a>, <a href = "http://www.twitter.com/emwdx/">@emwdx</a>. </p>
+
+  </div> <!-- .container-->
+
+    <script>
+        renderMathInElement(document.body,
+          [
+    {left: "$$", right: "$$", display: true},
+    {left: "\\[", right: "\\]", display: false},
+    {left: "\\(", right: "\\)", display: false}
+  ]);
+      </script>
+</body>
+
+</html>
